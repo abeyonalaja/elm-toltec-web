@@ -1,4 +1,4 @@
-module Model exposing (Model, initModel, Page(..), PageState(..), getPage)
+module Model exposing (Model, initialModel, Page(..), PageState(..), getPage)
 
 import Json.Decode as Decode exposing (Value)
 
@@ -12,15 +12,15 @@ type Page
 
 
 type PageState
-    = Locaded Page
-    | TansitioningFrom Page
+    = Loaded Page
+    | TransitioningFrom Page
 
 
 type alias Model =
     { pageState : PageState }
 
 
-initialModel : Value -> model
+initialModel : Value -> Model
 initialModel val =
     { pageState = Loaded Blank }
 

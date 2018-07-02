@@ -1,4 +1,4 @@
-module Route exposing (Route(..), fromlocation, href, modifyUrl)
+module Route exposing (Route(..), fromLocation, href, modifyUrl)
 
 import Html exposing (Attribute)
 import Html.Attributes as Attr
@@ -50,8 +50,8 @@ modifyUrl : Route -> Cmd msg
 modifyUrl =
     routeToString >> Navigation.modifyUrl
 
-fromlocation : Location -> Maybe Route
-fromlocation location =
+fromLocation : Location -> Maybe Route
+fromLocation location =
     if String.isEmpty location.hash then
         Just Root
     else
