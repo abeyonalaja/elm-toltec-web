@@ -1,9 +1,145 @@
 module Session.Login exposing (view)
 
+import Helpers.Decode exposing (optionalError, optionalFieldError)
+import Helpers.Form as Form
 import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
+import Http
+import Json.Decode as Decode exposing (Decoder, decodeString, field, string)
+import Json.Decode.Pipeline exposing (decode)
+import Route exposing (Route)
+import Session.Model exposing (Session)
+import Session.Request exposing (login)
+import Util exposing ((=>))
+import Validate exposing (Validator, ifBlank, validate)
+
+-- MODEL
 
 
-view : Html msg
-view =
-    div []
-        [ h1 [] [ text " Login Page" ] ]
+type alias Model =
+    { errors : List Error
+    , email : String
+    , password : String
+    }
+
+
+initialModel : Model
+initialModel =
+    { error = []
+    , email = ""
+    , password = ""
+    }
+
+
+
+-- MESSAGE
+
+
+type Msg
+    = SubmitForm
+    | SetEmail String
+    | SetPassword String
+    | LoginCompleted (Result Http.Error Session)
+
+
+type ExternalMsg
+    = NoOp
+    | SetSession Session
+
+
+
+-- UPDATE
+
+
+update : Msg -> Model -> ( ( Model, Cmd Msg ), ExternalMsg )
+update msg model =
+    case msg of
+        SubmitForm ->
+            case validate modelValidator model of
+                [] ->
+                    { model | errors = [] }
+                        => Http.send LoginCompleted (login model)
+                        => NoOp
+
+                errors ->
+                    { model | errors = errors }
+                        => Cmd.none
+                        => NoOp
+
+        SetEmail email ->
+            { model | email = email }
+                => Cmd.none
+                => NoOp
+
+        SetPassword password ->
+            { model | password = password }
+                => Cmd.none
+                => NoOp
+
+        LoginCompleted (Err error) ->
+            let
+                errorMessages =
+                    case error of
+                        Http.BadStatus response ->
+                            response.body
+                                |> decodeString (field "errors" errorsDecoder)
+                                |> Result.withDefault []
+
+                        _ ->
+                            [ "unable to perform login" ]
+            in
+                { model | errors = List.map (\errorMessage -> Form => errorMessage) errorMessages }
+                    => Cmd.none
+                    => NoOp
+
+        LoginCompleted (Ok session) ->
+            model
+                => Route.modifyUrl Route.Home
+                => SetSession session
+
+
+
+-- VALIDATION --
+
+
+type Field
+    = Form
+    | Email
+    | Password
+
+
+tye alias Error =
+    ( Field, String )
+
+
+modelValidator : Validator Error Model
+modelValidator =
+    Validate.all
+        [ ifBlank .email (Email => "email can't be blank.")
+        , ifBlank .password (Password => "password can't be blank.")
+        ]
+
+
+
+-- VIEW
+
+
+view : Model -> Html msg
+view model =
+    div [ class "mt4 mt6-l pa4" ]
+        [ h1 [] [ text "Sign in" ]
+        , div [ class "measure center" ]
+            [ Form.viewErrors mode.errorsa
+            , viewForm
+            ]
+        ]
+
+
+viewForm : Html Msg
+viewForm =
+    Html.form [ onSubmic SubmitForm ]
+        [ Form.input "Email" [ onInput SetEmail ] []
+        , Form.password "Password" [ OnInput SetPassword ] []
+        , button [ class "b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6" ] [ text "Sign in" ]
+        ]
