@@ -6,6 +6,7 @@ import Model exposing (Model, Page(..), PageState(..), getPage, initialModel)
 import Navigation exposing (Location)
 import Route exposing (Route)
 import Session.Login as Login
+import Session.Register as Register
 import Util exposing ((=>))
 
 
@@ -33,7 +34,7 @@ updateRoute maybeRoute model =
             model => Cmd.none
 
         Just Route.Register ->
-            { model | pageState = Loaded Register } => Cmd.none
+            { model | pageState = Loaded (Register Register.initialModel) } => Cmd.none
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -62,6 +63,21 @@ updatePage page msg model =
             in
             { newModel | pageState = Loaded (Login pageModel) }
                 => Cmd.map LoginMsg cmd
+
+        ( RegisterMsg subMsg, Register subModel ) ->
+            let
+                ( ( pageModel, cmd ), msgFromPage ) =
+                    Register.update subMsg subModel
+
+                newModel =
+                    case msgFromPage of
+                        Register.NoOp ->
+                            model
+
+                        Register.SetSession session ->
+                            { model | session = Just session }
+            in
+            { newModel | pageState = Loaded (Register pageModel) } => Cmd.map RegisterMsg cmd
 
         ( _, NotFound ) ->
             model => Cmd.none

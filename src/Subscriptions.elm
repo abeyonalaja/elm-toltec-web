@@ -26,5 +26,5 @@ pageSubscriptions page =
         Login _ ->
             Sub.none
 
-        Register ->
+        Register _ ->
             Sub.none

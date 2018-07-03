@@ -3,6 +3,7 @@ module Model exposing (Model, Page(..), PageState(..), getPage, initialModel)
 import Json.Decode as Decode exposing (Value)
 import Session.Login as Login exposing (..)
 import Session.Model as Session exposing (Session)
+import Session.Register as Register
 
 
 type Page
@@ -10,7 +11,7 @@ type Page
     | NotFound
     | Home
     | Login Login.Model
-    | Register
+    | Register Register.Model
 
 
 type PageState

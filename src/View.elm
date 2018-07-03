@@ -43,6 +43,7 @@ viewPage isLoading page =
                 |> frame Page.Login
                 |> Html.map LoginMsg
 
-        Register ->
-            Register.view
+        Register subModel ->
+            Register.view subModel
                 |> frame Page.Register
+                |> Html.map RegisterMsg
