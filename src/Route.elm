@@ -23,6 +23,7 @@ route =
         , Url.map Register (s "register")
         ]
 
+
 routeToString : Route -> String
 routeToString page =
     let
@@ -33,22 +34,28 @@ routeToString page =
 
                 Root ->
                     []
+
                 Login ->
-                    ["login"]
+                    [ "login" ]
+
                 Logout ->
-                    ["logout"]
+                    [ "logout" ]
+
                 Register ->
-                    ["register"]
+                    [ "register" ]
     in
-        "#/" ++ String.join "/" pieces
+    "#/" ++ String.join "/" pieces
+
 
 href : Route -> Attribute msg
 href route =
-    Attr.href(routeToString route)
+    Attr.href (routeToString route)
+
 
 modifyUrl : Route -> Cmd msg
 modifyUrl =
     routeToString >> Navigation.modifyUrl
+
 
 fromLocation : Location -> Maybe Route
 fromLocation location =

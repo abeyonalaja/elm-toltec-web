@@ -1,6 +1,6 @@
 module Page.NotFound exposing (view)
 
-import Html exposing (Html, h1, div, text)
+import Html exposing (Html, div, h1, text)
 
 
 view : Html msg

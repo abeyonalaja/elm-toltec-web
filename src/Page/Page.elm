@@ -44,7 +44,7 @@ navbarLink activePage route linkContent =
                 False ->
                     "gray"
     in
-        a [ Route.href route, class "link hover-black f6 f5-ns dib mr3 mr4-ns", class active ] linkContent
+    a [ Route.href route, class "link hover-black f6 f5-ns dib mr3 mr4-ns", class active ] linkContent
 
 
 isActive : ActivePage -> Route -> Bool

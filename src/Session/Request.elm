@@ -4,7 +4,7 @@ import Session.AuthToken as AuthToken exposing (AuthToken)
 import User.Model as User exposing (User)
 import Session.Model as Session exposing (Session)
 import Http
-import Json.decode as Decode exposing (Decoder)
+import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import Helpers.Request exposing (apiUrl)
 import Util exposing (( => ))

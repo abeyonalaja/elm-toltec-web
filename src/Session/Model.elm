@@ -1,10 +1,10 @@
 module Session.Model exposing (Session, decoder, encode)
 
-import Seesion.AuthToken as AuthToken exposing (AuthToken, decoder)
-import User.Model as User exposing (User, decoder)
 import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (decode, required, optional)
+import Json.Decode.Pipeline exposing (decode, optional, required)
 import Json.Encode as Encode exposing (Value)
+import Session.AuthToken as AuthToken exposing (AuthToken, decoder)
+import User.Model as User exposing (User, decoder)
 import Util exposing ((=>))
 
 

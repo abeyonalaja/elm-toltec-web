@@ -1,12 +1,12 @@
 module Helpers.Form exposing (input, password, textarea, viewErrors)
 
-import Html exposing (Attribute, Html, fieldset, li, text, ul, label)
-import Html.Attributes as Attr exposing (class, type_, name)
+import Html exposing (Attribute, Html, fieldset, label, li, text, ul)
+import Html.Attributes as Attr exposing (class, name, type_)
 
 
 password : String -> List (Attribute msg) -> List (Html msg) -> Html msg
 password name attrs =
-    control Html.input name ([ type_ password ] ++ attrs)
+    control Html.input name ([ type_ "password" ] ++ attrs)
 
 
 input : String -> List (Attribute msg) -> List (Html msg) -> Html msg

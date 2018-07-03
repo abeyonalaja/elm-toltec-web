@@ -1,10 +1,11 @@
-module Update exposing (update, init)
+module Update exposing (init, update)
 
 import Json.Decode as Decode exposing (Value)
-import Model exposing (Model, initialModel, Page(..), PageState(..), getPage)
 import Messages exposing (Msg(..))
+import Model exposing (Model, Page(..), PageState(..), getPage, initialModel)
 import Navigation exposing (Location)
 import Route exposing (Route)
+import Session.Login as Login
 import Util exposing ((=>))
 
 
@@ -19,19 +20,19 @@ updateRoute maybeRoute model =
         Nothing ->
             { model | pageState = Loaded NotFound } => Cmd.none
 
-        Just (Route.Home) ->
+        Just Route.Home ->
             { model | pageState = Loaded Home } => Cmd.none
 
-        Just (Route.Root) ->
+        Just Route.Root ->
             model => Route.modifyUrl Route.Home
 
-        Just (Route.Login) ->
+        Just Route.Login ->
+            { model | pageState = Loaded (Login Login.initialModel) } => Cmd.none
+
+        Just Route.Logout ->
             model => Cmd.none
 
-        Just (Route.Logout) ->
-            model => Cmd.none
-
-        Just (Route.Register) ->
+        Just Route.Register ->
             { model | pageState = Loaded Register } => Cmd.none
 
 
@@ -45,3 +46,25 @@ updatePage page msg model =
     case ( msg, page ) of
         ( SetRoute route, _ ) ->
             updateRoute route model
+
+        ( LoginMsg subMsg, Login subModel ) ->
+            let
+                ( ( pageModel, cmd ), msgFromPage ) =
+                    Login.update subMsg subModel
+
+                newModel =
+                    case msgFromPage of
+                        Login.NoOp ->
+                            model
+
+                        Login.SetSession session ->
+                            { model | session = Just session }
+            in
+            { newModel | pageState = Loaded (Login pageModel) }
+                => Cmd.map LoginMsg cmd
+
+        ( _, NotFound ) ->
+            model => Cmd.none
+
+        ( _, _ ) ->
+            model => Cmd.none

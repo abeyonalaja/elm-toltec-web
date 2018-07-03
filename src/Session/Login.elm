@@ -1,4 +1,4 @@
-module Session.Login exposing (view)
+module Session.Login exposing (ExternalMsg(..), Model, Msg, initialModel, update, view)
 
 import Helpers.Decode exposing (optionalError, optionalFieldError)
 import Helpers.Form as Form
@@ -14,6 +14,7 @@ import Session.Request exposing (login)
 import Util exposing ((=>))
 import Validate exposing (Validator, ifBlank, validate)
 
+
 -- MODEL
 
 
@@ -26,7 +27,7 @@ type alias Model =
 
 initialModel : Model
 initialModel =
-    { error = []
+    { errors = []
     , email = ""
     , password = ""
     }
@@ -46,6 +47,18 @@ type Msg
 type ExternalMsg
     = NoOp
     | SetSession Session
+
+
+
+-- DECODERS --
+
+
+errorsDecoder : Decoder (List String)
+errorsDecoder =
+    decode (\email password error -> error :: List.concat [ email, password ])
+        |> optionalFieldError "email"
+        |> optionalFieldError "password"
+        |> optionalError "error"
 
 
 
@@ -89,9 +102,9 @@ update msg model =
                         _ ->
                             [ "unable to perform login" ]
             in
-                { model | errors = List.map (\errorMessage -> Form => errorMessage) errorMessages }
-                    => Cmd.none
-                    => NoOp
+            { model | errors = List.map (\errorMessage -> Form => errorMessage) errorMessages }
+                => Cmd.none
+                => NoOp
 
         LoginCompleted (Ok session) ->
             model
@@ -109,7 +122,7 @@ type Field
     | Password
 
 
-tye alias Error =
+type alias Error =
     ( Field, String )
 
 
@@ -125,12 +138,12 @@ modelValidator =
 -- VIEW
 
 
-view : Model -> Html msg
+view : Model -> Html Msg
 view model =
     div [ class "mt4 mt6-l pa4" ]
         [ h1 [] [ text "Sign in" ]
         , div [ class "measure center" ]
-            [ Form.viewErrors mode.errorsa
+            [ Form.viewErrors model.errors
             , viewForm
             ]
         ]
@@ -138,8 +151,8 @@ view model =
 
 viewForm : Html Msg
 viewForm =
-    Html.form [ onSubmic SubmitForm ]
+    Html.form [ onSubmit SubmitForm ]
         [ Form.input "Email" [ onInput SetEmail ] []
-        , Form.password "Password" [ OnInput SetPassword ] []
+        , Form.password "Password" [ onInput SetPassword ] []
         , button [ class "b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6" ] [ text "Sign in" ]
         ]
