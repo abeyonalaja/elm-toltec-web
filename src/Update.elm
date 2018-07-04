@@ -5,6 +5,8 @@ import Json.Decode as Decode exposing (Value)
 import Messages exposing (Msg(..))
 import Model exposing (Model, Page(..), PageState(..), getPage, initialModel)
 import Navigation exposing (Location)
+import Page.Error as Error
+import Page.Page as Page exposing (ActivePage)
 import Ports
 import Route exposing (Route)
 import Session.Login as Login
@@ -16,6 +18,15 @@ import Util exposing ((=>))
 init : Value -> Location -> ( Model, Cmd Msg )
 init val location =
     updateRoute (Route.fromLocation location) (initialModel val)
+
+
+pageError : Model -> ActivePage -> String -> ( Model, Cmd msg )
+pageError model activePage errorMessage =
+    let
+        error =
+            Error.pageError activePage errorMessage
+    in
+    { model | pageState = Loaded (Error error) } => Cmd.none
 
 
 updateRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -73,6 +84,9 @@ updatePage page msg model =
                     [ Ports.storeSession Nothing
                     , Route.modifyUrl Route.Home
                     ]
+
+        ( LogoutCompleted (Err error), _ ) ->
+            pageError model Page.Other "There was a problem while trying to logout"
 
         ( RegisterMsg subMsg, Register subModel ) ->
             let

@@ -23,6 +23,9 @@ pageSubscriptions page =
         Register _ ->
             Sub.none
 
+        Error _ ->
+            Sub.none
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =

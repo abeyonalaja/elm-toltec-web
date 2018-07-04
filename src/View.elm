@@ -3,6 +3,7 @@ module View exposing (..)
 import Html exposing (..)
 import Messages exposing (Msg(..))
 import Model exposing (Model, Page(..), PageState(..))
+import Page.Error as Error
 import Page.Home as Home
 import Page.NotFound as NotFound
 import Page.Page as Page exposing (ActivePage)
@@ -43,6 +44,10 @@ viewPage isLoading session page =
             Login.view subModel
                 |> frame Page.Login
                 |> Html.map LoginMsg
+
+        Error subModel ->
+            Error.view subModel
+                |> frame Page.Other
 
         Register subModel ->
             Register.view subModel

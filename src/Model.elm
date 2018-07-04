@@ -1,6 +1,7 @@
 module Model exposing (Model, Page(..), PageState(..), getPage, initialModel)
 
 import Json.Decode as Decode exposing (Value)
+import Page.Error as Error exposing (PageError)
 import Session.Login as Login exposing (..)
 import Session.Model as Session exposing (Session)
 import Session.Register as Register
@@ -12,6 +13,7 @@ type Page
     | Home
     | Login Login.Model
     | Register Register.Model
+    | Error PageError
 
 
 type PageState
