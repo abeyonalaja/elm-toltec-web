@@ -79,6 +79,17 @@ updatePage page msg model =
             in
             { newModel | pageState = Loaded (Register pageModel) } => Cmd.map RegisterMsg cmd
 
+        ( SetSession newSession, _ ) ->
+            let
+                cmd =
+                    if model.session /= Nothing && newSession == Nothing then
+                        Route.modifyUrl Route.Home
+                    else
+                        Cmd.none
+            in
+            { model | session = newSession }
+                => cmd
+
         ( _, NotFound ) ->
             model => Cmd.none
 
