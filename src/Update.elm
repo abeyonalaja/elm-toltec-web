@@ -1,12 +1,15 @@
 module Update exposing (init, update)
 
+import Http
 import Json.Decode as Decode exposing (Value)
 import Messages exposing (Msg(..))
 import Model exposing (Model, Page(..), PageState(..), getPage, initialModel)
 import Navigation exposing (Location)
+import Ports
 import Route exposing (Route)
 import Session.Login as Login
 import Session.Register as Register
+import Session.Request exposing (logout)
 import Util exposing ((=>))
 
 
@@ -31,7 +34,7 @@ updateRoute maybeRoute model =
             { model | pageState = Loaded (Login Login.initialModel) } => Cmd.none
 
         Just Route.Logout ->
-            model => Cmd.none
+            model => (Http.send LogoutCompleted <| logout model.session)
 
         Just Route.Register ->
             { model | pageState = Loaded (Register Register.initialModel) } => Cmd.none
@@ -63,6 +66,13 @@ updatePage page msg model =
             in
             { newModel | pageState = Loaded (Login pageModel) }
                 => Cmd.map LoginMsg cmd
+
+        ( LogoutCompleted (Ok ()), _ ) ->
+            { model | session = Nothing }
+                => Cmd.batch
+                    [ Ports.storeSession Nothing
+                    , Route.modifyUrl Route.Home
+                    ]
 
         ( RegisterMsg subMsg, Register subModel ) ->
             let
